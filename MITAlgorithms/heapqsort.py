@@ -1,6 +1,4 @@
 
-
-
 def heapfy(A, heapsize, index):
     """
 

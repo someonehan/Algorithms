@@ -12,36 +12,57 @@ such that the sum is closest to target. return the sum of the
 
 
 class ShortInputException(Exception):
+    """
+    new exception class that for the short length
+    """
     def __init__(self, length, atleast):
+        """
+        init method
+        :param length:the error length
+        :param atleast:the min length
+        """
         super().__init__(self)
         self.length = length
         self.atleast = atleast
 
     def __repr__(self):
+        """
+        override the __repr__ method
+        :return:
+        """
         return self.__str__()
 
     def __str__(self):
+        """
+        override the __str__ method for display the exception
+        :return:
+        """
         return 'array need {0} items but {1} given'.format(self.atleast,self.length)
+
 
 class Solution:
     def threeSumClosest(self, nums, target):
         if len(nums) < 3:
-            raise ShortInputException(len(nums), 3)
-        pass
+            raise ShortInputException(len(nums), target)
+
+        nums = sorted(nums)
+
+        
 
 class TestSolution(unittest.TestCase):
     def setUp(self):
         self.solution = Solution()
 
     def test_threeSumClosest_one_integer(self):
-        self.solution.threeSumClosest([], 1)
-        self.assertRaises(ShortInputException)
+        self.assertRaises(ShortInputException, self.solution.threeSumClosest,[], 2)
 
     def test_threeSumClosest_three_Interger(self):
-        pass
+        result = self.solution.threeSumClosest([-1, 2, 1], 1)
+        self.assertTrue(2, result)
 
     def test_threeSumClosest_example(self):
-        pass
+        result = self.solution.threeSumClosest([-1, 2, 1, 4], 1)
+        self.assertTrue(2, result)
 
 
 

@@ -107,5 +107,6 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(2, result[1])
         self.assertEqual(4, result[2])
 
+
 if __name__ == "__main__":
     unittest.main()

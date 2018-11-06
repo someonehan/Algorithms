@@ -4,10 +4,20 @@ class LNode:
         self.elem = elem
         self.next_ = next_
 
+class LinkedListUnderflow(ValueError):
+    pass
+
 
 class LList(list):
-    def __init__(self):
+    def __init__(self, iterable = None):
         self.head = LNode(0)
+        if iterable:
+            last = self.head.next_
+            while last:
+                last = last.next_
+            for item in iterable:
+                last.next_ = LNode(item)
+                last.next_ = last.next_.next_
 
     def append(self, p_object): # real signature unknown; restored from __doc__
         """ L.append(object) -> None -- append object to end """
@@ -18,14 +28,13 @@ class LList(list):
         last.next_ = node
         self.head.elem += 1
 
-    def appendHead(self, p_object):
+    def prepend(self, p_object):
         """ L.appendhead(object) -> None -- append object to head"""
         # if not self.head:
         #     self.head = LNode(p_object)
         # else:
         # if list is empty
-        node = LNode(p_object)
-        node.next_, self.head.next_ = self.head.next_, node
+        self.head.next_ = LNode(p_object, self.head)
         self.head.elem += 1
 
     def insert(self, index, p_object): # real signature unknown; restored from __doc__
@@ -52,26 +61,63 @@ class LList(list):
 
     def count(self, value): # real signature unknown; restored from __doc__
         """ L.count(value) -> integer -- return number of occurrences of value """
-        return 0
+        occurs = 0
+        current = self.head.next_
+        while current:
+            if current.elem == value:
+                occurs += 1
+            current = current.next_
+        return occurs
 
     def extend(self, iterable): # real signature unknown; restored from __doc__
         """ L.extend(iterable) -> None -- extend list by appending elements from the iterable """
-        pass
+        last = self.head.next_
+        while last:
+            last = last.next_
+        for item in iterable:
+            last.next_ = LNode(item)
+            last.next_ = last.next_.next_
 
     def index(self, value, start=None, stop=None): # real signature unknown; restored from __doc__
         """
         L.index(value, [start, [stop]]) -> integer -- return first index of value.
         Raises ValueError if the value is not present.
         """
-        return 0
-
+        start = start if start else 0
+        stop = stop if stop else self.head.elem
+        current_node = self.head.next_
+        find = False
+        while start < stop:
+            current_node = current_node.next_
+            start += 1
+            if current_node.elem == value:
+                find = True
+                break
+        if not find:
+            raise ValueError('the value in not present')
+        return start
 
     def pop(self, index=None): # real signature unknown; restored from __doc__
         """
         L.pop([index]) -> item -- remove and return item at index (default last).
         Raises IndexError if list is empty or index is out of range.
         """
-        pass
+        if not self.head.next_:
+            raise IndexError('the list is empty')
+        if index:
+            if self.head.elem < index:
+                raise IndexError("index is out of range")
+
+            pre = self.head.next_
+            for i in range(index):
+                pre = pre.next_
+            e = pre.next_.elem
+            pre.next_ = pre.next_.next_
+            return e
+        else:
+            e = self.head.next_.elem
+            self.head.next_ = self.head.next_.next_
+            return e
 
     def remove(self, value): # real signature unknown; restored from __doc__
         """
@@ -132,21 +178,13 @@ class LList(list):
         """ Implement self*=value. """
         pass
 
-    def __init__(self, seq=()): # known special case of list.__init__
-        """
-        list() -> new empty list
-        list(iterable) -> new list initialized from iterable's items
-        # (copied from class doc)
-        """
-        pass
-
     def __iter__(self, *args, **kwargs): # real signature unknown
         """ Implement iter(self). """
         pass
 
     def __len__(self, *args, **kwargs): # real signature unknown
         """ Return len(self). """
-        pass
+        return self.head.elem
 
     def __le__(self, *args, **kwargs): # real signature unknown
         """ Return self<=value. """

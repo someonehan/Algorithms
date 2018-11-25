@@ -1,15 +1,107 @@
+import unittest
 
 class LNode:
-    def __init__(self, elem, next_=None):
+    def __init__(self, elem, prev=None, next_=None):
         self.elem = elem
         self.next_ = next_
+        self.prev = prev
 
 class LinkedListUnderflow(ValueError):
     pass
 
 
+class LoopList:
+    def __init__(self):
+        self.head = None
+        self.size = 0
+
+    def search(self, key):
+        """
+        set head to index
+        find the node with value equals to key and return it
+        :param key: the value to be find
+        :return: the fist node with value k disappear in list
+        """
+        index = self.head
+        while index and index.elem != key:
+            index = index.next_
+        return index
+
+    def insert(self, x):
+        """
+        insert value x into the head of the list
+        :param x: the value to be inserted
+        """
+        node = LNode(x, None, self.head)
+        if self.head:
+            self.head.prev = node
+        self.head = node
+        self.size += 1
+
+    def delete(self, key):
+        """
+        delete the node with value key
+        :param key: the value to be deleted
+        :return:
+        """
+        node = self.search(key)
+        if node.prev:
+            node.prev.next_ = node.next_
+        else:
+            self.head = node.next_
+        if node.next_:
+            node.next_.prev = node.prev
+        self.size -= 1
+
+    def __contains__(self, item):
+        """
+        when use the key word 'in' and 'not in' call the method __contains__
+        :param item:
+        :return:
+        """
+        return self.search(item) != None
+
+    def __len__(self):
+        """
+        when use the key word 'len' call the method __len__
+        :return: the length of the list
+        """
+        return self.size
+
+    def __str__(self):
+        """
+        return the string of the list
+        :return:
+        """
+        values = []
+        index = self.head
+        while index:
+            values.append(index.elem)
+            index = index.next_
+        return str(values)
+
+class TestLoopList(unittest.TestCase):
+    def setUp(self):
+        self.l = LoopList()
+
+    def test_insert(self):
+        self.l.insert(1)
+        self.assertEqual(1, self.l.head.elem)
+        self.assertEqual(1, len(self.l))
+
+    def test_contains(self):
+        self.l.insert(1)
+        self.assertTrue(1 in self.l)
+        self.assertEqual(1, len(self.l))
+
+    def test_delete(self):
+        self.l.insert(1)
+        self.l.delete(1)
+        self.assertFalse(1 in self.l)
+        self.assertEqual(0, len(self.l))
+
 class LList(list):
-    def __init__(self, iterable = None):
+    def __init__(self, iterable=None):
         self.head = LNode(0)
         if iterable:
             last = self.head.next_
@@ -228,3 +320,6 @@ class LList(list):
         pass
 
     __hash__ = None
+
+if __name__ == "__main__":
+    unittest.main()

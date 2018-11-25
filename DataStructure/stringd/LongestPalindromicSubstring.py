@@ -23,7 +23,6 @@ class Solution:
                         result = s[i:j+1]
         return result
 
-
     def _isPalindromicString(self, s):
         len_ = len(s)
         if len_ % 2 == 0:
@@ -48,8 +47,9 @@ class Solution:
                 right += 1
             return result
 
-    def LongestPalindromicSubstring2(self,s):
+    def LongestPalindromicSubstring2(self, s):
         pass
+
 
 class TestSolution(unittest.TestCase):
     def setUp(self):
@@ -63,6 +63,16 @@ class TestSolution(unittest.TestCase):
     def test_LongestPalidromicSubstring_all(self):
         s = 'abcba'
         result = self.solution.LongestPalindromicSubstring(s)
+        self.assertEqual('abcba', result)
+
+    def test_LongestPalindromicSubstring2(self):
+        s = "cbbd"
+        result = self.solution.LongestPalindromicSubstring2(s)
+        self.assertEqual('bb', result)
+
+    def test_LongestPalidromicSubstring2_all(self):
+        s = 'abcba'
+        result = self.solution.LongestPalindromicSubstring2(s)
         self.assertEqual('abcba', result)
 
     def test_isPalindromString_true(self):

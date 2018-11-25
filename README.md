@@ -25,7 +25,7 @@
   </tr>
   <tr>
     <th>2018/11/25</th>
-    <th><a href="https://github.com/someonehan/Algorithms/blob/master/MITAlgorithms/lecrute06/heapsort.py">generate parentheses</a></th>
+    <th><a href="https://github.com/someonehan/Algorithms/blob/master/LeetCode/String/GenerateParentheses.py">generate parentheses</a></th>
     <th>generateParentheses.py</th>
     <th><a href="https://leetcode.com/problems/generate-parentheses/solution/">leetcode url</a></th>
   </tr>

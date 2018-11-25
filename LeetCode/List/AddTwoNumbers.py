@@ -3,7 +3,7 @@
 # datetime:2018/10/26
 
 import unittest
-from .Common import ListNode
+from common.Common import ListNode
 
 """
 given two non_empty linked lists representing two non_negative integers, the digits are stored

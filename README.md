@@ -13,6 +13,12 @@
     <th>heapsort.py</th>
     <th>heap sort</th>
   </tr>
+  <tr>
+    <th>2018/12/04</th>
+    <th><a href="https://github.com/someonehan/Algorithms/blob/master/MITAlgorithms/lecrute11-12-13/BST.py">bst</a></th>
+    <th>BST.py</th>
+    <th>binary search tree</th>
+  </tr>
 </table>
 <h2>data structure</h2>
 <h2>Leet code</h2>

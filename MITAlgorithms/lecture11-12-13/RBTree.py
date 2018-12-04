@@ -4,6 +4,16 @@ from .BST import BSTNode, BST
 RED = 'red'
 BLACK = 'black'
 
+"""
+红黑树是一棵二叉树， 有五大特征：
+
+特征一： 节点要么是红色，要么是黑色（红黑树名字由来）。
+特征二： 根节点是黑色的
+特征三： 每个叶节点(nil或空节点)是黑色的。
+特征四： 每个红色节点的两个子节点都是黑色的（相连的两个节点不能都是红色的）。
+特征五： 从任一个节点到其每个叶子节点的所有路径都是包含相同数量的黑色节点。
+"""
+
 
 class RBNode(BSTNode):
     """
@@ -22,9 +32,12 @@ class RBNode(BSTNode):
     def color(self, value):
         if value in (RED, BLACK):
             self.color = value
+        else:
+            raise ValueError
 
 
 class RBTree(BST):
+
     null = RBNode(sys.maxsize, None)
 
     def __init__(self):

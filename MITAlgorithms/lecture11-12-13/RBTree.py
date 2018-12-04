@@ -1,13 +1,27 @@
-from .BST import BSTNode, BST
 import sys
+from .BST import BSTNode, BST
 
 RED = 'red'
 BLACK = 'black'
-class RBNode(BSTNode):
 
+
+class RBNode(BSTNode):
+    """
+    init red-black tree node
+    the different with bst node is that this node's has color property
+    """
     def __init__(self, key, parent=None):
         super(RBNode, self).__init__(key, parent)
         self.color = BLACK
+
+    @property
+    def color(self):
+        return self.color
+
+    @color.setter
+    def color(self, value):
+        if value in (RED, BLACK):
+            self.color = value
 
 
 class RBTree(BST):

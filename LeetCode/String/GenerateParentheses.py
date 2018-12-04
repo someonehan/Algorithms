@@ -45,8 +45,25 @@ class Solution:
         generate()
         return ans
 
-    def generateParentheses2(self, n):
-        pass
+    def generateParentheses_Backtracking(self, n):
+        """
+
+        :param n:
+        :return:
+        """
+        ans = []
+        def backtrack(S='', left=0, right=0):
+            if len(S) == 2 * n:
+                ans.append(S)
+                return
+            if left < n:
+                backtrack(S+'(', left+1, right)
+            if right < left:
+                backtrack(S, left, right + 1)
+
+        backtrack()
+        return ans
+
 class TestSolution(unittest.TestCase):
     def setUp(self):
         self.solution = Solution()

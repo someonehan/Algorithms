@@ -1,78 +1,74 @@
 import sys
+import unittest
+import numpy as np
+"""
+1. 动态规划和分治法的区别
+   动态规划应用于子问题重叠的情况
+   分治法应用于子问题互不相交
+2. 动态规划使用的方式是使用表格法，把子问题只求解一次然后将问题保存到表格中，从而无需每次都要重新计算
+"""
 
-def createPrice():
+class Solution:
     """
-    create the price of each length of rod
-    :return: dict of price of each length of rod
+    链条切割问题
+    给定一段长度为n英寸的钢条和一个价格表，求切割方案，使得收益r最大
+    长度  1  2  3  4  5  6  7  8  9  10
+    价格  1  5  8  9  10 17 17 20 24 30
+
+    分析过程：
+    1. 长度为n英寸的钢条共有 2（n-1）中切割方案。每一个英寸都有两种选择切割或者不切割。
+    2. 那么1....n之间一定存在一个值k(1<=k<=n) (1...k之间不切割，k....n之间切割) 使得卖出的价格最高
+    3. 解决方案可以是迭代的方式
+
+
     """
-    i = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    P = [1, 5, 8, 9, 10, 17, 17, 20, 24, 30]
-    rodprice = dict(zip(i, P))
-    return rodprice
 
-def cutRod(n):
-    prices = createPrice()
-    if n == 0:
-        return 0
-    best_price = -sys.maxsize
-    for cut_len in range(1, n + 1):
-        best_price = max(best_price, prices[cut_len] + cutRod(n-cut_len))
-        print(cut_len, best_price)
-    return best_price
+    def __init__(self):
+        self.p = [1, 5, 8, 9, 10, 17, 17, 20, 24, 30]
 
-def memoizeCutRod(n):
-    r = [-sys.maxsize for _ in range(n)]
-    return memoizedCutRodAux(n, r)
-
-def memoizedCutRodAux(n, r):
-    prices = createPrice()
-
-    if r[n - 1] >= 0:
-        return r[n]
-    if n == 0:
-        q = 0
-    else:
-        q = -sys.maxsize
+    def get_max_price1(self, n):
+        if n == 0:
+            return 0
+        max_price = -1
+        # i 表示切割的长度
         for i in range(1, n + 1):
-            q = max(q, prices[i] + memoizedCutRodAux(n - i, r))
+            max_p = self.p[i - 1] + self.get_max_price1(n-i)
+            max_price = max(max_price, max_p)
+        return max_price
 
-    r.append(q)
-    return q
 
-def bottomUpCutRod(n):
-    prices = createPrice()
-    r = []
-    r.append(0)
-    for i in range(1, n+1):
-        q = -sys.maxsize
-        for j in range(1, i + 1):
-            q = max(q, prices[j] + r[i - j])
-        r.append(q)
-        print(r)
-    return r[n]
+    def get_max_price_memoized(self, n):
+        c = np.zeros((n, 1))
 
-def bottomUpCutRod2(n):
-    prices = createPrice()
-    r = []
-    s = {}
-    r.append(0)
-    for j in range(1, n + 1):
-        q = -sys.maxsize
-        for i in range(1, j + 1):
-            if q < prices[i] + r[j - i]:
-                s[j] = i
-                q = prices[i] + r[j - i]
-        r.append(q)
-    return r[n],s
+    def get_max_price_bottom_up(self, n):
+        c = [k for k in range(0, n+1)]
+        for i in range(1, n + 1):
+            q = -1
+            for j in range(1, i + 1):
+                q = max(q, self.p[j-1] + c[i-j])
+            c[i] = q
+        print(c)
+        return c[n]
 
-def printCutRodSolution(n):
-    (r,s) = bottomUpCutRod2(n)
-    print('the result is:{0}'.format(r))
-    print('and the piece is:')
-    while n:
-        print(s[n])
-        n = n - s[n]
+class TestSolution(unittest.TestCase):
+    def setUp(self):
+        self.solution = Solution()
 
+    def test_get_max_price1(self):
+        ret = self.solution.get_max_price1(1)
+        self.assertEqual(1, ret)
+    #
+    def test_get_max_price1_2(self):
+        ret = self.solution.get_max_price1(2)
+        self.assertEqual(5, ret)
+
+    def test_get_max_price1_10(self):
+        ret = self.solution.get_max_price1(10)
+        self.assertEqual(30, ret)
+
+    def test_get_max_bottom_up(self):
+        ret = self.solution.get_max_price_bottom_up(10)
+        self.assertEqual(30, ret)
 
 if __name__ == "__main__":
-    print(printCutRodSolution(6))
+    unittest.main()

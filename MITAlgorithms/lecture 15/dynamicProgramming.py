@@ -6,6 +6,11 @@ import numpy as np
    动态规划应用于子问题重叠的情况
    分治法应用于子问题互不相交
 2. 动态规划使用的方式是使用表格法，把子问题只求解一次然后将问题保存到表格中，从而无需每次都要重新计算
+
+1. Characterize the structure of an optimal solution
+2. Recursively define the value of an optimal solution
+3. Compute the value of an optimal solution, typically in an bottom-up fashion
+4. Construct an optimal solution from computed information
 """
 
 class Solution:

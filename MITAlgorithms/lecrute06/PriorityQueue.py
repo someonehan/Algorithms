@@ -2,8 +2,11 @@ import unittest
 import itertools
 import heapq
 
+
 class PriorityQueue:
+
 	REMOVEED = '<remove-task>'
+
 	def __init__(self):
 		self._queue = []
 		self.entry_finder = {}

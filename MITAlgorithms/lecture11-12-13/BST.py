@@ -1,11 +1,58 @@
+# coding:utf-8
+
+"""
+this file is about binary search tree
+
+the search tree structure supports many dynamic-set operations
+
+1. how to walk a binary search tree to print its values in a sorted order
+2. how to search a value in a binary search tree
+3. how to find the minimum or maximum element
+4. how to find the predecessor or successor of an element
+5. how to insert into or delete from a binary search tree
+"""
+
+# ----------------------------------------------------------
+# what is a binary search tree?
+
+# a binary search tree is organized in a binary tree
+#              6
+#             /  \
+#            5    7
+#           / \    \
+#          2  5     8
+# node: for any node x, the keys in the left subtree of x are at most x.key and the keys in the right
+# subtree of x are at least x.key. this means that the binary-search-tree-property
+# Let x be a node in a binary search tree. if y is a node in the left subtree of x then y.key <= x.key
+# if y is a node in the right subtree of x then x.key >= x.key
+
+# we can represent such a tree by a linked data structure in which each node is an object
+# in addition to a key and satellite data, each node contains left, right and p
+
+
+def inorder_tree_walk(root):
+    """
+    this algorithm prints the key of the root of a subtree between printing the values in its left subtree
+    and printing those in its right subtree
+    """
+    if root:
+        inorder_tree_walk(root.left)
+        print(root.key)
+        inorder_tree_walk(root.right)
+
 
 class BSTNode(object):
     """A Binary search tree node"""
-    def __init__(self, key = None, parent = None):
+    def __init__(self, key=None, parent=None):
         """
         create a Binary Search Tree Node
-        :param key: the key of the node
-        :param parent: the parent of the node
+
+        Parameters
+         ---------
+            key: int
+            the key of the node
+        parent: BSTNode
+            the parent of the node
         """
         self.parent = parent
         self.left = None

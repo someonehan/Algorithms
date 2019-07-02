@@ -133,6 +133,7 @@ class BSTNode(object):
                 p = p.parent
             return p
 
+    #
     def insert(self, node):
         """
         insert the node into the tree rooted self

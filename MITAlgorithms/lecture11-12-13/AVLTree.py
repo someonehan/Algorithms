@@ -40,14 +40,34 @@ class Node(object):
             left_lines, left_pos, left_width = [], 0, 0
         else:
             left_lines, left_pos, left_width = self.left._str()
-
-        if self.right is Node:
+        if self.right is None:
             right_lines, right_pos, right_width = [], 0, 0
         else:
             right_lines, right_pos, right_width = self.right._str()
+        middle = max(right_pos + left_width - left_pos + 1, len(label), 2)
+        pos = left_pos + middle // 2
+        width = left_pos + middle + right_width - right_pos
+        while len(left_lines) < len(right_lines):
+            left_lines.append(' ' * left_width)
+        while len(right_lines) < len(left_lines):
+            right_lines.append(' ' * right_width)
+        if (middle - len(label)) % 2 == 1 and self.parent is not None and \
+                self is self.parent.left and len(label) < middle:
+            label += '.'
+        label = label.center(middle, '.')
+        if label[0] == '.': label = ' ' + label[1:]
+        if label[-1] == '.': label = label[:-1] + ' '
+        lines = [' ' * left_pos + label + ' ' * (right_width - right_pos),
+                 ' ' * left_pos + '/' + ' ' * (middle - 2) +
+                 '\\' + ' ' * (right_width - right_pos)] + \
+                [left_line + ' ' * (width - left_width - right_width) + right_line
+                 for left_line, right_line in zip(left_lines, right_lines)]
+        return lines, pos, width
 
     def __str__(self):
         return '\n'.join(self._str()[0])
+
+    __repr__ = __str__
 
     def find(self, key):
         """finds and return the node with key from the subtree at this node
@@ -125,22 +145,16 @@ class Node(object):
         parent = None
         current = self
         while current and current.key != node.key:
-            parent = current.parent
+            parent = current
             if current.key > node.key:
                 current = current.left
             else:
                 current = current.right
-        # in this case the T is None
-        # and the should set T.root by node
-        if not current:
-            pass
-
-        if parent.key > node.key:
-            parent.left = node
-            node.parent = parent
-        else:
+        node.parent = parent
+        if node.key >= parent.key:
             parent.right = node
-            node.parent = parent
+        else:
+            parent.left = node
 
     def delete(self, node):
         """delete and return this node from the tree rooted self
@@ -206,6 +220,12 @@ class AVL():
         """init an empty tree"""
         self.root = None
 
+    def __str__(self):
+        if self.root is None:
+            return '<empty tree>'
+        else:
+            return str(self.root)
+
     def find(self, key):
         """finds and returns the node with key from the subtree rooted at this node
 
@@ -249,10 +269,11 @@ class AVL():
             self.root = y
         else:
             if x is y.parent.left:
-                y.parent.left = x
+                y.parent.left = y
             else:
-                y.parent.right = x
+                y.parent.right = y
 
+        x.right = y.left
         y.left = x
         x.parent = y
         update_height(x)
@@ -269,9 +290,88 @@ class AVL():
                 y.parent.left = y
             else:
                 y.parent.right = y
+        x.left = y.right
         y.right = x
         x.parent = y
         update_height(x)
         update_height(y)
+
+
+    def rebalance(self, node):
+        while node is not None:
+            update_height(node)
+            if height(node.left) >= 2 + height(node.right):
+                if height(node.left.left) >= height(node.left.right):
+                    self.right_rotate(node)
+                else:
+                    self.left_rotate(node.left)
+                    self.right_rotate(node)
+            elif height(node.right) >= 2 + height(node.left):
+                if height(node.right.right) >= height(node.right.left):
+                    self.left_rotate(node)
+                else:
+                    self.right_rotate(node.right)
+                    self.left_rotate(node)
+            node = node.parent
+
+    def insert(self, k):
+        """Inserts a node with key k into the subtree rooted at this node.
+        this avl version
+
+        Parameters:
+        -----------
+        k : key
+            the key of the node bo be inserted
+        """
+        node = Node(None, k)
+        if self.root is None:
+            self.root = node
+        else:
+            self.root.insert(node)
+        self.rebalance(node)
+
+    def delete(self, k):
+        """deletes and returns a node with key k if it exists from the tree
+        this AVL version guarantees the balances property h = O(lg n)
+
+        Parameters:
+        ----------
+            k : the key of the node we want to delete
+
+        Returns:
+        --------
+            the deleted node with the key k
+        """
+        node = self.find(k)
+        if node is None:
+            return None
+        if node is self.root:
+            p = Node(None, 0)
+            p.left = self.root
+            self.root.parent = p
+            deleted = self.root.delete(node)
+            self.root = p.left
+
+        else:
+            deleted = self.root.delete(node)
+
+        self.rebalance()
+
+def main():
+    import random, sys
+
+    items = [random.randrange(100) for i in range(100)]
+
+    tree = AVL()
+    print(tree)
+
+    for item in items:
+        tree.insert(item)
+        print("\nadd  " + str(item))
+        print(tree)
+
+if __name__ == "__main__":main()
+
+
 
 

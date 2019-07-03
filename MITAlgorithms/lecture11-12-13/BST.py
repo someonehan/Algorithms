@@ -204,27 +204,21 @@ class BST(object):
         :param k:the key
         :return: the node with key else None
         """
-        if not self.root:
-            return None
-        return self.root.search(k)
+        return self.root and self.root.search(k)
 
     def find_min(self):
         """
         find the node with minimum key of the tree
         :return: the node with minimum key
         """
-        if not self.root:
-            return None
-        return self.root.find_min()
+        return self.root and self.root.find_min()
 
     def find_max(self):
         """
         find the node with maximum key of the tree
         :return: the node with maximum key
         """
-        if not self.root:
-            return None
-        return self.root.find_max()
+        return self.root and self.root.find_max()
 
     def delete(self):
 

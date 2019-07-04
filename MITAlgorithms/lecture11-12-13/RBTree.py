@@ -52,64 +52,78 @@ class RBNode(BSTNode):
             raise ValueError
 
 
-class RBTree(BST):
-
+class RBTree:
     null = RBNode(sys.maxsize, None)
 
     def __init__(self):
-        super(RBTree, self).__init__()
         self.node_cls = RBNode
+        self.root = None
 
     def leftRotate(self, x):
-        """
-        left rotate the node
-        :param x:
-        :return:
-        """
-        # set the right node's left to the x node's right
-        y = x.right
-        x.right = y.left
-        if y.left:
-            y.left.parent = x
-        # change the node's parent
-        y.parent = x.parent
-        if not y.parent:
-            self.root = y
-        elif x == x.parent.left:
-            x.parent.left = y
-        else:
-            x.parent.right = y
+        """left rotate the node
 
+        """
+        y = x.right
+        y.parent = x.parent
+        if y.parent is None:
+            self.root = y
+        else:
+            if x is y.parent.left:
+                y.parent.left = y
+            else:
+                y.parent.right = y
+
+        x.right = y.left
         y.left = x
         x.parent = y
 
-    def rightRotate(self, y):
+    def rightRotate(self, x):
         """
 
         :param y:
         :return:
         """
-        x = y.left
-        y.left = x.right
-        if x.right:
-            x.right.parent = y
-
-        x.parent = y.parent
-        if not x.parent:
-            self.root = x
-        elif y.parent.left == y:
-            y.parent.left = x
+        y = x.left
+        y.parent = x.parent
+        if y.parent is None:
+            self.root = y
         else:
-            y.parent.right = x
+            if x is y.parent.left:
+                y.parent.left = y
+            else:
+                y.parent.right = y
+        x.left = y.right
+        y.left = x
+        x.parent = y
 
-        x.right = y
-        y.parent = x
-
+    # https://www.geeksforgeeks.org/red-black-tree-set-2-insert/
     def insert(self, node):
+        """red-black tree insert action
+        perform standard BST insertion and set the node'color red
+
+        Parameters:
+        -----------
+        node : RBNode
+            the node to be inserted into the red-black tree
+        """
         if not isinstance(node, self.node_cls):
             return
-
-        super().insert(node)
+        parent = None
+        current = self
+        while current:
+            parent = current
+            if current.key >= node.key:
+                current = current.left
+            else:
+                current = current.right
+        if parent is None:
+            self.root = node
+        else:
+            if parent.key >= node.key:
+                parent.left = node
+            else:
+                parent.right = node
+        node.parent = parent
 
         node.left = RBTree.null
         node.right = RBTree.null
@@ -117,11 +131,49 @@ class RBTree(BST):
 
         self.insert_fixup()
 
+    # https://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/
+    def delete(self, node):
+        pass
+
     def insert_fixup(self, node):
         """
-        after insert a node, the tree maybe
-        :param node:
-        :return:
+        2) if x is root, change color os x as BLACK(black height of complete tree increases by 1)
+        3) do following if color of x's parent is not black
+           a) if x's uncle is red(grand parent must have been black)
+              i) change color of parent and uncle as black
+              ii) color of grand parent as RED
+              iii) change x = x's grand parent, repeat steps 2 and 3 for new x
+           b) if x's uncle is black, then there can be four configurations for x, x'parent and x'grandp
+              i) left left case(p is left child of g ans x is left child of p)
+              ii) left right case(p is left child of g and x is right child of p)
+              iii) right right case(Mirror of case i)
+              iiii) right left case(Mirror of case ii)
         """
+        while node.parent.color == RED:
+            if node.parent.parent.left.color == RED and node.parent.parent.right.color == RED:
+                node.parent.parent.color = RED
+                node.parent.parent.left.color = BLACK
+                node.parent.parent.right.color = BLACK
+                node = node.parent.parent
+            else:
+                if node.parent is node.parent.parent.left:
+                    if node is node.parent.left:
+                        # right rotate g
+                        # swap colors of g and p
+                        self.rightRotate(node.parent.parent)
+                        node.parent.color, node.parent.right.color = node.parent.right.color, node.parent.color
+                    else:
+                        # left rotate p and it turn to left left case
+                        self.leftRotate(node.parent)
+                        self.rightRotate(node.parent)
+                        node.color, node.right.color = node.right.color, node.color
+                else:
+                    if node is node.parent.right:
+                        self.leftRotate(node.parent.parent)
+                        node.parent.left.color, node.parent.color = node.parent.color, node.parent.left.color
+                    else:
+                        self.rightRotate(node.parent)
+                        self.leftRotate(node.parent)
+                        node.color, node.left.color = node.left.color, node.color
 
-        pass
+

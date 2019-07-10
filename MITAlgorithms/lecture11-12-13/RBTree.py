@@ -133,6 +133,11 @@ class RBTree:
 
     # https://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/
     def delete(self, node):
+        """
+
+        :param node:
+        :return:
+        """
         pass
 
     def insert_fixup(self, node):

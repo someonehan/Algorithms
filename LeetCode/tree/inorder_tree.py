@@ -1,7 +1,6 @@
 #! _*_ coding:utf-8 _*_
 
 
-
 def inorder_tree_walk(node, result):
     """inorder traversal a tree rooted as node
 

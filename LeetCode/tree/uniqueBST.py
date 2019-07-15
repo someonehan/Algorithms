@@ -6,7 +6,7 @@ Example:
 	input:3
 	output:
 	[
-		[1, null, 3a]
+		[1, null, 2, 3]
 		[3,2,null,1],
   		[3,1,null,null,2],
   		[2,1,3],
@@ -36,24 +36,22 @@ def generateTree( n):
 
 	return generate(1, n) if n else []
 
-def test_generateTree():
+def t_generateTree():
 	result = generateTree(3)
 	root_nodes = [item for item in result]
-	
-	def inorder(node):
-		result = []
-		current = node
-		father_nodes = []
-		while current or len(father_nodes) > 0:
-			while current:
-				father_nodes.append(current)
-				current = current.left
 
-			current = father_nodes.pop()
-			result.append(current.key)
-			current = current.right
-		print(result)
-		return result
+
+	def inorder(node):
+		r = []
+		current = node
+		r.append(current.key)
+		while current:
+			if current.left:
+				r.append(current.left.key)
+			if current.right:
+				r.append(current.right.key)
+			current = current.left or current.right
+		return r
 
 
 	ans = []
@@ -64,4 +62,4 @@ def test_generateTree():
 
 
 if __name__ == "__main__":
-	test_generateTree()
+	t_generateTree()

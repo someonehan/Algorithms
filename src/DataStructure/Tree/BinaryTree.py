@@ -1,113 +1,224 @@
-from queue import Queue
+
 from abc import abstractmethod
 from .tree import Tree
-from ..list.LinkedStack import LinkedStack
+
 
 class BinaryTree(Tree):
+    """abstract base class implement a binary tree structure"""
 
     @abstractmethod
     def left(self, p):
-        raise NotImplementedError("must be implement in subclass")
+        """return a position representing p's left child
+        return None if p does not have a left child
+        """
+        raise NotImplemented("must be implemented in the subclass")
 
     @abstractmethod
     def right(self, p):
-        raise NotImplementedError("must be implement in subclass")
+        """return a positon representing p's right child
+        return None if p does not have a right child
+        """
+        raise NotImplemented("must be implemneted in the subclass")
 
     def sibling(self, p):
-        """return  a position representing p's sibling(or None if no sibling)"""
+        """return a position representing p's sibling
+        None if no sibling
+        """
         parent = self.parent(p)
         if parent is None:
-            # if the position has no parent, no sibling
             return None
-        # determined the position is the left child or the right child of its parent
-        if p is self.left(parent):
-            return self.right(p)
         else:
-            return self.left(p)
+            if p == self.left(parent):
+                return self.right(parent)
+            else:
+                return self.left(parent)
 
     def children(self, p):
+        """generate an iteration of positon representing p's children"""
         if self.left(p) is not None:
             yield self.left(p)
         if self.right(p) is not None:
             yield self.right(p)
 
-    #-------------------------iteration methods of tree----------------------------
-    def positions(self):
-        pass
 
-    def pre_order(self):
-        if not self.is_empty():
-            for p in self._subtree_preorder(self.root()):
-                yield p
+class LinkedBinaryTree(BinaryTree):
+    """linked representing of a binary tree structure"""
 
-    def _subtree_preorder(self, p):
-        """preorder iter all the elements from the root position"""
-        yield p
-        for c in self.children(p):
-            for o in self._subtree_preorder(c):
-                yield o
+    class _Node:
+        __slots__ = "element", "left", "right", "parent"
 
-    def _subtree_preorder_iter(self, p):
-        """preorder all the elements from the root position use iter method"""
-        q = Queue()
-        q.put(p)
-        while not q.empty():
-            p = q.get()
-            yield p
-            for c in self.children(p):
-                q.put(c)
+        def __init__(self,element, **kwargs):
+            self.element = element
+            self.left = kwargs.get("left", None)
+            self.right = kwargs.get("right", None)
+            self.parent = kwargs.get("parent", None)
 
-    def post_order(self):
-        """generate a postorder of position in the tree"""
-        if not self.is_empty():
-            for p in self._subtree_postorder(self.root()):
-                yield p
+    class Position(BinaryTree.Position):
+        """an implemention representing the location of a single element"""
 
-    def _subtree_postorder(self, p):
-        """generate a postorder iteration of position in subtree rooted at p"""
-        for c in self.children(p):
-            for other in self._subtree_postorder(c):
-                yield other
-        yield p
+        def __init__(self, container, node):
+            """this constructor should not be invoked by user."""
+            self.container = container
+            self.node = node
 
-    def _subtree_postorder_iter(self, p):
-        s =LinkedStack()
-        self._subtree_generator_left(s, p)
-        while not s.is_empty():
-            l = s.top()
-            s.pop()
-            yield l
-            self._subtree_generator_left(s, self.sibling(l))
+        def element(self):
+            """return the element stored in the position"""
+            return self.node.element
 
-    def _subtree_generator_left(self, s, p):
-        while p is not None:
-            s.push(p)
-            p = self.left(p)
+        def __eq__(self, other):
+            """override the the parent class
+            return True if other is a position representing the same location
+            """
+            return type(self) == type(other) and self.node is other.node
 
-    def breathFirst(self, t, visit):
-        q = Queue()
-        p = t.root()
-        if p is not None:
-            q.put(p._node)
-            while not q.empty():
-                item = q.get()
-                visit(item)
-                if item._left is not None:
-                    q.put(item._left)
-                if item._right is not None:
-                    q.put(item._right)
+    def __init__(self):
+        """create an initally empty binary tree"""
+        self._root = None
+        self._size = 0
 
-    def in_order(self):
-        if not self.is_empty():
-            for item in self._subtree_inorder(self.root()):
-                yield item
+    def _make_position(self, node):
+        """return the position for the given node
+        or None if no node
+        """
+        return self.Position(self, node) if node is not None else None
 
-    def _subtree_inorder(self, p):
-        if self.left(p) is not None:
-            yield self._subtree_inorder(self.left(p))
-        yield p
-        if self.right(p) is not None:
-            yield self._subtree_inorder(self.right(p))
+    def _validate_position(self, p):
+        """return the associate node, if the position valid"""
+        if not isinstance(p, self.Position):
+            raise TypeError("p must be proper Position type")
+        if p.container is not self:
+            raise TypeError("p does not belong to this container")
+        if p.node.parent is p.node:
+            raise TypeError("p is no longer valid")
+        return p.node
 
-if __name__ == "__main__":
-    print("hello")
+    def __len__(self):
+        """return the total number of the tree
+        or None if tree if empty
+        """
+        return self._size
+
+    def root(self):
+        """return the root position of the tree
+        or None if the tree is empty"""
+        return self._make_position(self._root)
+
+    def parent(self, p):
+        """return the position of p's parent
+        or None if the p is root
+        """
+        node = self._validate_position(p)
+        return self._make_position(node)
+
+    def left(self, p):
+        """return the position of p's left child
+        or None if no left child
+        """
+        node = self._validate_position(p)
+        return self._make_position(node.left)
+
+    def right(self, p):
+        """return the position of the p's right child
+        or None if no right child
+        """
+        node = self._validate_position(p)
+        return self._make_position(node.right)
+
+    def num_children(self, p):
+        """return the number of children of position p"""
+        node = self._validate_position(p)
+        count = 0
+        if node.left is not None:
+            count = count + 1
+        if node.right is not None:
+            count = count + 1
+        return count
+
+    #--------------udpate methods-----------------------------
+    def _add_root(self, e):
+        """place element e at the root of an empty tree and return new Position
+        Raise ValueError if tree noempty
+        """
+        if self._root is not None:
+            raise ValueError("root exists")
+        self._size = 1
+        self._root = self._Node(e)
+        return self._make_position(self._root)
+
+    def _add_left(self, p, e):
+        """create a new left child for position p,storing element e
+        return the position of new node
+        Raise ValueError if position p is invalid or p already has a left child
+        """
+        node = self._validate_position(p)
+        if node.left is not None:
+            raise ValueError("left child exists")
+        self._size += 1
+        node.left = self._Node(e, parent=node)
+        return self._make_position(node.left)
+
+    def _add_right(self, p, e):
+        """create a new right child for position p, storing element e
+        return the position of new node
+        Raise ValueError if position p is invalid or p already has a right child
+        """
+        node = self._validate_position(p)
+        if node.right is not None:
+            raise ValueError("right child exists")
+        self._size += 1
+        node.right = self._Node(e, parent=node)
+        return self._make_position(node.right)
+
+    def _replace(self, p, e):
+        """replace the element at position of p with e
+        and return the old element
+        """
+        node = self._validate_position(p)
+        old = node.element
+        node.element = e
+        return old
+
+    def _delete(self, p):
+        """delete the node at position p, and replace it with it's child if any
+        return the element that had been stored at position p
+        Raise ValueError if position p is invalid or p has two position
+        """
+        node = self._validate_position(p)
+        if self.num_children() == 2:
+            raise ValueError("p has two children")
+        child = node.left if node.left else node.right
+        if child is not None:
+            child.parent = node.parent
+
+        if node is self._root:
+            self._root = child
+        else:
+            parent = node.parent
+            if child is parent.left:
+                parent.left = child
+            else:parent.right = child
+        self._size -= 1
+        node.parent = node  # convention for deprecated node
+        return node.element
+
+    def _attach(self, p, t1, t2):
+        """attach trees t1 and t2 as left and right subtree of external p
+
+        raise ValueError if the position is not left
+        """
+        node = self._validate_position(p)
+        if not self.is_leaf(p):
+            raise ValueError("position must be external p")
+        if not type(self) is type(t1) is type(t2):
+            raise ValueError("three types must be the same")
+        self._size += len(t1) + len(t2)
+        if not t1.is_empty():
+            t1._root.parent = node
+            node.left = t1._root
+            t1._root = self._root
+            t1._size = 0
+        if not t2.is_empty():
+            t2._root.parent = node
+            node.right = t2._root
+            t2._root = self._root
+            t2._size = 0

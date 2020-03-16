@@ -47,7 +47,7 @@ class LinkedBinaryTree(BinaryTree):
     class _Node:
         __slots__ = "element", "left", "right", "parent"
 
-        def __init__(self,element, **kwargs):
+        def __init__(self, element, **kwargs):
             self.element = element
             self.left = kwargs.get("left", None)
             self.right = kwargs.get("right", None)

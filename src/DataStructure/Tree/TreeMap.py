@@ -198,6 +198,51 @@ class TreeMap(LinkedBinaryTree, MapBase):
         self._delete(p)
         self._rebalance_delete(p)
 
+    #--------------------additional utilities-------------------
+    def _swap(self, parent, child, make_left_child):
+        """relink parent node and child node
+        all child None
+        """
+        if make_left_child:
+            parent.left = child
+        else:
+            parent.right = child
+        if child is not None:
+            child.parent = parent
+
+    def _left_rotate(self, x):
+        """left rotate the binary tree rooted x"""
+        y = x.right
+        x.right = y.left
+        if y.left is not None:
+            y.left.parent = x
+
+        if x.parent is None:
+            self._root = y
+        elif x == x.parent.left:
+            x.parent.left = y
+        else:x.parent.right = y
+
+        x.parent = y
+        y.left = x
+
+    def _right_rotate(self, x):
+        """right rotate the binary tree rooted x"""
+        y = x.left
+        x.left = y.right
+        if y.right is not None:
+            y.right.parent = x
+
+        if x.parent is None:
+            self._root = y
+        elif x == x.parent.left:
+            x.parent.left = y
+        else:
+            x.parent.right = y
+
+        x.parent = y
+        y.right = x
+
     def _rebalance_access(self, p):
         pass
 
